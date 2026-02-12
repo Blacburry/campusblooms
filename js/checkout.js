@@ -23,37 +23,45 @@ async function startPayment() {
     return;
   }
 
-  const orderResponse = await fetch("http://localhost:5000/create-order", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ amount: totalAmount })
-  });
+  // ✅ Correct create-order call
+  const orderResponse = await fetch(
+    "https://campusblooms-backend.onrender.com/create-order",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ amount: totalAmount })
+    }
+  );
 
   const order = await orderResponse.json();
 
   const options = {
-    key: "rzp_test_SFHeLgkEUUfs9T",
+    key: "rzp_test_SFNQT0wxXlGuFI",
     amount: order.amount,
     currency: "INR",
     order_id: order.id,
 
     handler: async function (response) {
 
-      const verifyResponse = await fetch("http://localhost:5000/verify-payment", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          razorpay_order_id: response.razorpay_order_id,
-          razorpay_payment_id: response.razorpay_payment_id,
-          razorpay_signature: response.razorpay_signature,
-          customer: { name, phone, address }
-        })
-      });
+      // ✅ Correct verify-payment call
+      const verifyResponse = await fetch(
+        "https://campusblooms-backend.onrender.com/verify-payment",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature: response.razorpay_signature,
+            customer: { name, phone, address }
+          })
+        }
+      );
 
       const data = await verifyResponse.json();
 
       if (data.success) {
-        localStorage.removeItem("cart"); // clear cart
+        localStorage.removeItem("cart");
         window.location.href = "success.html";
       } else {
         alert("Payment succeeded but order notification failed.");
