@@ -1,3 +1,5 @@
+const BACKEND_URL = "https://campusblooms-backend.onrender.com";
+
 function getCartTotal() {
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
   return cart.reduce((sum, item) => sum + item.price, 0);
@@ -12,9 +14,9 @@ function loadCheckoutTotal() {
 }
 
 async function startPayment() {
-  const name = document.getElementById("name").value;
-  const phone = document.getElementById("phone").value;
-  const address = document.getElementById("address").value;
+  const name = document.getElementById("name").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const address = document.getElementById("address").value.trim();
 
   const totalAmount = getCartTotal();
 
@@ -23,54 +25,63 @@ async function startPayment() {
     return;
   }
 
-  // ✅ Correct create-order call
-  const orderResponse = await fetch(
-    "https://campusblooms-backend.onrender.com/create-order",
-    {
+  try {
+    // 🔹 Create Order
+    const orderResponse = await fetch(`${BACKEND_URL}/create-order`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ amount: totalAmount })
+    });
+
+    if (!orderResponse.ok) {
+      throw new Error("Failed to create Razorpay order");
     }
-  );
 
-  const order = await orderResponse.json();
+    const order = await orderResponse.json();
 
-  const options = {
-    key: "rzp_test_SFNQT0wxXlGuFI",
-    amount: order.amount,
-    currency: "INR",
-    order_id: order.id,
+    const options = {
+      key: "rzp_test_SFNQT0wxXlGuFI", // Replace with live key when going live
+      amount: order.amount,
+      currency: "INR",
+      order_id: order.id,
 
-    handler: async function (response) {
+      handler: async function (response) {
+        try {
+          // 🔹 Verify Payment
+          const verifyResponse = await fetch(`${BACKEND_URL}/verify-payment`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              customer: { name, phone, address }
+            })
+          });
 
-      // ✅ Correct verify-payment call
-      const verifyResponse = await fetch(
-        "https://campusblooms-backend.onrender.com/verify-payment",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_signature: response.razorpay_signature,
-            customer: { name, phone, address }
-          })
+          const data = await verifyResponse.json();
+
+          if (data.success) {
+            localStorage.removeItem("cart");
+            window.location.href = "success.html";
+          } else {
+            alert("Payment succeeded but order notification failed.");
+          }
+
+        } catch (err) {
+          alert("Payment verification failed.");
+          console.error(err);
         }
-      );
-
-      const data = await verifyResponse.json();
-
-      if (data.success) {
-        localStorage.removeItem("cart");
-        window.location.href = "success.html";
-      } else {
-        alert("Payment succeeded but order notification failed.");
       }
-    }
-  };
+    };
 
-  const rzp = new Razorpay(options);
-  rzp.open();
+    const rzp = new Razorpay(options);
+    rzp.open();
+
+  } catch (error) {
+    alert("Something went wrong. Please try again.");
+    console.error(error);
+  }
 }
 
 loadCheckoutTotal();
