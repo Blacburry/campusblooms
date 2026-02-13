@@ -1,4 +1,11 @@
-const BACKEND_URL = "http://localhost:5000";
+const API_URLS = {
+  development: "http://localhost:5000",
+  production: "https://campusblooms-backend.onrender.com" // 🔴 REPLACE THIS WITH YOUR DEPLOYED BACKEND URL
+};
+
+const BACKEND_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+  ? API_URLS.development
+  : API_URLS.production;
 
 function getCartTotal() {
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
@@ -101,8 +108,8 @@ async function startPayment() {
     rzp.open();
 
   } catch (error) {
-    alert("Something went wrong. Please try again.");
-    console.error(error);
+    console.error("Payment error:", error);
+    alert("Payment failed. Please check the console for details and ensure the backend URL is configured correctly.");
   }
 }
 
