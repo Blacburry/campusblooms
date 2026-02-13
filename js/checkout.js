@@ -80,7 +80,8 @@ async function startPayment() {
     });
 
     if (!verifyResponse.ok) {
-      throw new Error("Backend verification failed");
+      const errorData = await verifyResponse.json();
+      throw new Error(errorData.error || "Backend verification failed");
     }
 
     const data = await verifyResponse.json();

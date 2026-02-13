@@ -73,10 +73,14 @@ Payment ID: ${razorpay_payment_id}`
 
     res.json({ success: true });
 
-  } catch (err) {
+    } catch (err) {
     console.error("Twilio Error:", err);
-    res.status(500).json({ success: false });
+    res.status(500).json({ success: false, error: err.message });
   }
+});
+
+app.get("/", (req, res) => {
+  res.send("Backend is running!");
 });
 
 app.listen(process.env.PORT, () => {
