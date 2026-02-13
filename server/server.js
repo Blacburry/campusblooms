@@ -47,15 +47,20 @@ app.post("/verify-payment", async (req, res) => {
     customer
   } = req.body;
 
-  const body = razorpay_order_id + "|" + razorpay_payment_id;
+  try {
+    const body = razorpay_order_id + "|" + razorpay_payment_id;
 
-  const expectedSignature = crypto
-    .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-    .update(body)
-    .digest("hex");
+    const expectedSignature = crypto
+      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+      .update(body)
+      .digest("hex");
 
-  if (expectedSignature !== razorpay_signature) {
-    return res.status(400).json({ success: false });
+    if (expectedSignature !== razorpay_signature) {
+      return res.status(400).json({ success: false, error: "Invalid Razorpay Signature. Ensure frontend Key ID and backend Key Secret belong to the same account." });
+    }
+  } catch (cryptoError) {
+    console.error("Crypto Error:", cryptoError);
+    return res.status(500).json({ success: false, error: "Server configuration error: " + cryptoError.message });
   }
 
   try {

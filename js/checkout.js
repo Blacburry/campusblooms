@@ -97,7 +97,7 @@ async function startPayment() {
 
   } catch (err) {
     console.error(err);
-    alert("Payment verification failed.");
+    alert("Payment verification failed: " + err.message);
     payBtn.innerText = "Pay Now 💖";
     payBtn.disabled = false;
   }
