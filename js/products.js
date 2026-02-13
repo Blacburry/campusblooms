@@ -26,11 +26,14 @@ products.forEach(product => {
   card.className = "product-card";
 
   card.innerHTML = `
+  <div class="product-image-wrapper">
     <img src="${product.image}" alt="${product.name}">
-    <h3>${product.name}</h3>
-    <p>₹${product.price}</p>
-    <button onclick="addToCart(${product.id})">Add to Cart</button>
-  `;
+  </div>
+
+  <h3>${product.name}</h3>
+  <p>₹${product.price}</p>
+  <button onclick="addToCart(${product.id})">Add to Cart</button>
+`;
 
   productList.appendChild(card);
 });

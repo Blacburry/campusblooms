@@ -7,17 +7,34 @@
 </head>
 <body>
 
-  <header>
-    <h1>CampusBlooms 🌸</h1>
-    <p>Valentine’s Flowers, Delivered with Love ❤️</p>
-    <a href="cart.html" class="cart-btn">🛒 View Cart</a>
-  </header>
+<header class="navbar">
+  <div class="container nav-content">
+    <h1 class="logo">CampusBlooms 🌸</h1>
+    <a href="cart.html" class="cart-btn cart-icon">
+  🛒
+  <span id="cart-count" class="cart-badge">0</span>
+</a>
 
-  <main class="products" id="product-list">
-    <!-- Products injected by JS -->
-  </main>
+  </div>
+</header>
 
-  <script src="js/products.js"></script>
-  <script src="js/cart.js"></script>
+<section class="hero">
+  <div class="container hero-content">
+    <h2>Valentine’s Flowers, Delivered with Love ❤️</h2>
+    <p>Handcrafted bouquets made to impress.</p>
+    <a href="#product-list" class="primary-btn">Shop Now</a>
+  </div>
+</section>
+
+<main class="container products" id="product-list">
+  <!-- Products injected by JS -->
+</main>
+<script src="js/products.js"></script>
+<script src="js/cart.js"></script>
+
+<div id="toast" class="toast">Added to cart ❤️</div>
+
+
+
 </body>
 </html>

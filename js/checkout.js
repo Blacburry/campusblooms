@@ -1,9 +1,18 @@
-const BACKEND_URL = "https://campusblooms-backend.onrender.com";
+const BACKEND_URL = "http://localhost:5000";
 
 function getCartTotal() {
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
-  return cart.reduce((sum, item) => sum + item.price, 0);
+
+  let total = 0;
+
+  cart.forEach(item => {
+    const product = products.find(p => p.id === item.id);
+    total += product.price * item.quantity;
+  });
+
+  return total;
 }
+
 
 function loadCheckoutTotal() {
   const total = getCartTotal();
@@ -24,6 +33,10 @@ async function startPayment() {
     alert("Please fill all customer details.");
     return;
   }
+
+  const payBtn = document.getElementById("pay-btn");
+  payBtn.innerText = "Processing...";
+  payBtn.disabled = true;
 
   try {
     // 🔹 Create Order
@@ -46,33 +59,42 @@ async function startPayment() {
       order_id: order.id,
 
       handler: async function (response) {
-        try {
-          // 🔹 Verify Payment
-          const verifyResponse = await fetch(`${BACKEND_URL}/verify-payment`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-              customer: { name, phone, address }
-            })
-          });
+  try {
 
-          const data = await verifyResponse.json();
+    const verifyResponse = await fetch(`${BACKEND_URL}/verify-payment`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        razorpay_order_id: response.razorpay_order_id,
+        razorpay_payment_id: response.razorpay_payment_id,
+        razorpay_signature: response.razorpay_signature,
+        customer: { name, phone, address }
+      })
+    });
 
-          if (data.success) {
-            localStorage.removeItem("cart");
-            window.location.href = "success.html";
-          } else {
-            alert("Payment succeeded but order notification failed.");
-          }
+    if (!verifyResponse.ok) {
+      throw new Error("Backend verification failed");
+    }
 
-        } catch (err) {
-          alert("Payment verification failed.");
-          console.error(err);
-        }
-      }
+    const data = await verifyResponse.json();
+
+    if (data.success) {
+      localStorage.removeItem("cart");
+      window.location.href = "success.html";
+    } else {
+      alert("Order recorded but notification failed.");
+      localStorage.removeItem("cart");
+      window.location.href = "success.html";
+    }
+
+  } catch (err) {
+    console.error(err);
+    alert("Payment verification failed.");
+    payBtn.innerText = "Pay Now 💖";
+    payBtn.disabled = false;
+  }
+}
+
     };
 
     const rzp = new Razorpay(options);

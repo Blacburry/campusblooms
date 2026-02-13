@@ -7,18 +7,24 @@
 </head>
 <body>
 
-<header>
-  <h1>Payment Successful 🎉</h1>
-  <p>Your order has been placed successfully!</p>
+<header class="navbar">
+  <div class="container nav-content">
+    <h1 class="logo">Order Successful 🎉</h1>
+  </div>
 </header>
 
-<div style="text-align:center; margin-top: 30px;">
-  <p>Preparing your bouquet with love 🌸</p>
+<div class="form-container" style="text-align:center;">
+  <h2>Payment Successful 💖</h2>
+  <p>Your bouquet is being prepared with love 🌸</p>
+  <br>
+  <a href="index.html" class="cart-btn">Back to Home</a>
 </div>
 
-<script src="js/whatsapp.js"></script>
 <script>
   window.onload = sendToWhatsApp;
 </script>
+
+<div id="toast" class="toast">Added to cart ❤️</div>
+
 </body>
 </html>

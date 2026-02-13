@@ -7,22 +7,32 @@
 </head>
 <body>
 
-<header>
-  <h1>Your Cart 🛒</h1>
-  <a href="index.html" class="cart-btn">← Back to Shop</a>
+<header class="navbar">
+  <div class="container nav-content">
+    <h1 class="logo">Your Cart 🛒</h1>
+    <a href="index.html" class="cart-btn">← Shop</a>
+  </div>
 </header>
 
-<main class="products" id="cart-items">
-  <!-- Cart items injected here -->
+<main class="container cart-container">
+
+  <!-- Cart Items Will Load Here -->
+  <div id="cart-items"></div>
+
+  <!-- Checkout Section -->
+  <div class="checkout-section">
+    <h2 id="total-price">Total: ₹0</h2>
+    <button class="primary-btn" onclick="goToCheckout()">
+      Proceed to Checkout 💳
+    </button>
+  </div>
+
 </main>
 
-<div style="text-align:center; margin: 30px;">
-  <h2 id="total-price">Total: ₹0</h2>
-  <button onclick="goToCheckout()" class="cart-btn">
-    Proceed to Checkout 💳
-  </button>
-</div>
-
+<script src="js/products.js"></script>
 <script src="js/cart.js"></script>
+
+<div id="toast" class="toast">Added to cart ❤️</div>
+
 </body>
 </html>
